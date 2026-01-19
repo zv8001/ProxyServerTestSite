@@ -52,12 +52,33 @@ function GetStatusText(IsUp, IsUnknown) {
 	return IsUp ? "Up" : "Down";
 }
 
+function SafeJsonParse(Text) {
+	try {
+		return JSON.parse(Text);
+	} catch {
+		return null;
+	}
+}
+
 async function FetchAndRender() {
 	try {
-		const Response = await fetch(BackendBaseUrl + "/api/status", { cache: "no-store" });
-		if (!Response.ok) throw new Error("BadStatus:" + Response.status);
+		const Response = await fetch(BackendBaseUrl + "/api/status", {
+			cache: "no-store",
+			headers: {
+				"ngrok-skip-browser-warning": "true",
+				"Accept": "application/json"
+			}
+		});
 
-		const Data = await Response.json();
+		const RawText = await Response.text();
+		if (!Response.ok) {
+			throw new Error("BadStatus:" + Response.status + " Body:" + RawText.slice(0, 200));
+		}
+
+		const Data = SafeJsonParse(RawText);
+		if (!Data) {
+			throw new Error("NonJsonResponse:" + RawText.slice(0, 200));
+		}
 
 		SetCardState("CardNode3", "BadgeNode3", "Up", "StateUp");
 		ApplyBackendDetail("Backend reachable. Polling Node 1 and Node 2 from Node 3.");
@@ -104,20 +125,28 @@ async function FetchAndRender() {
 			SetBanner("", "", false);
 		}
 	} catch (Error) {
+		console.log("FetchAndRender Error:", Error);
+
 		SetCardState("CardNode3", "BadgeNode3", "Down", "StateDown");
-		ApplyBackendDetail("Backend unreachable. Assuming Node 1 and Node 2 are down, but their status cannot be verified.");
+
+		const IsLikelyCors = typeof Error === "object" && Error && String(Error).toLowerCase().includes("failed to fetch");
+		if (IsLikelyCors) {
+			ApplyBackendDetail("Fetch blocked by the browser (likely CORS). Backend may be up, but the page cannot read it.");
+		} else {
+			ApplyBackendDetail("Backend unreachable. Assuming Node 1 and Node 2 are down, but their status cannot be verified.");
+		}
 
 		SetCardState("CardNode1", "BadgeNode1", "Unknown", "StateUnknown");
 		SetCardState("CardNode2", "BadgeNode2", "Unknown", "StateUnknown");
 
-		ApplyNodeDetails("Node1", "Assumed down", "Node 3 is down, status cannot be verified.");
-		ApplyNodeDetails("Node2", "Assumed down", "Node 3 is down, status cannot be verified.");
+		ApplyNodeDetails("Node1", "Assumed down", "Node 3 is down or unreachable from this page, status cannot be verified.");
+		ApplyNodeDetails("Node2", "Assumed down", "Node 3 is down or unreachable from this page, status cannot be verified.");
 
 		SetLastUpdated("Last Updated: Backend unreachable");
 
 		SetBanner(
 			"Status Unknown",
-			"Node 3 is down. Node 1 and Node 2 are assumed down, but the true status is unknown.",
+			"Node 3 cannot be queried from this page. Node 1 and Node 2 are assumed down, but the true status is unknown.",
 			true
 		);
 	}
