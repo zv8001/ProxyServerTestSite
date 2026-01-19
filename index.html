@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Status</title>
+	<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+	<div class="Page">
+		<header class="Header">
+			<div class="Title">Service Status</div>
+			<div id="LastUpdated" class="Subtitle">Loading</div>
+		</header>
+
+		<section class="Grid">
+			<div class="Card" id="CardNode3">
+				<div class="CardTop">
+					<div class="CardTitle">PROXY NODE #3</div>
+					<div class="Badge" id="BadgeNode3">Loading</div>
+				</div>
+				<div class="CardBody">
+					<div class="Hint">Backend that checks other nodes</div>
+					<div class="Small" id="DetailNode3"></div>
+				</div>
+			</div>
+
+			<div class="Card" id="CardNode1">
+				<div class="CardTop">
+					<div class="CardTitle">PROXY NODE #1</div>
+					<div class="Badge" id="BadgeNode1">Loading</div>
+				</div>
+				<div class="CardBody">
+					<div class="Hint" id="HintNode1">Waiting for backend</div>
+					<div class="Small" id="DetailNode1"></div>
+				</div>
+			</div>
+
+			<div class="Card" id="CardNode2">
+				<div class="CardTop">
+					<div class="CardTitle">PROXY NODE #2</div>
+					<div class="Badge" id="BadgeNode2">Loading</div>
+				</div>
+				<div class="CardBody">
+					<div class="Hint" id="HintNode2">Waiting for backend</div>
+					<div class="Small" id="DetailNode2"></div>
+				</div>
+			</div>
+		</section>
+
+		<section class="Banner" id="Banner">
+			<div class="BannerTitle" id="BannerTitle"></div>
+			<div class="BannerText" id="BannerText"></div>
+		</section>
+	</div>
+
+	<script src="app.js"></script>
+</body>
+</html>
