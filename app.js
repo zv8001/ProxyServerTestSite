@@ -1,4 +1,4 @@
-const BackendBaseUrl = "http://localhost:2917";
+const BackendBaseUrl = "http://147.185.221.23:53927";
 const PollIntervalMs = 5000;
 
 function SetCardState(CardId, BadgeId, StatusText, StateClass) {
