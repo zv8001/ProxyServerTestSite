@@ -1,4 +1,4 @@
-const BackendBaseUrl = "https://sandiest-disillusive-kymberly.ngrok-free.app";
+const BackendBaseUrl = "https://utstatuswebsitelink0128.ututcproxyservers2819.com/";
 const PollIntervalMs = 5000;
 
 function SetCardState(CardId, BadgeId, StatusText, StateClass) {
