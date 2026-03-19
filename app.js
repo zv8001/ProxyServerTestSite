@@ -1,4 +1,4 @@
-const BackendBaseUrl = "https://utstatuswebsitelink0128.ututcproxyservers2819.com";
+const BackendBaseUrl = "https://statusapi.unknown-technologies.us";
 const PollIntervalMs = 5000;
 
 function SetCardState(CardId, BadgeId, StatusText, StateClass) {
