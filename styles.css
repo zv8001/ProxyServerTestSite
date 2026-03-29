@@ -1,139 +1,334 @@
-:root{
-	--Bg: #0b0f17;
-	--Panel: rgba(255,255,255,0.06);
-	--Panel2: rgba(255,255,255,0.09);
-	--Text: rgba(255,255,255,0.92);
-	--Muted: rgba(255,255,255,0.65);
-	--Border: rgba(255,255,255,0.10);
-	--Up: rgba(40, 200, 120, 0.95);
-	--Down: rgba(255, 80, 100, 0.95);
-	--Unknown: rgba(180, 190, 210, 0.95);
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;700&display=swap');
+
+:root {
+    --Bg:       #0d1117;
+    --Surface:  #161b22;
+    --Border:   rgba(255,255,255,0.07);
+    --Text:     rgba(255,255,255,0.90);
+    --Muted:    rgba(255,255,255,0.45);
+    --Up:       #238636;
+    --Degraded: #9e6a03;
+    --Down:     #da3633;
+    --NoData:   rgba(255,255,255,0.08);
+    --DotUp:    #3fb950;
+    --DotDeg:   #d29922;
+    --DotDown:  #f85149;
+    --DotUnk:   #8b949e;
+    --Accent:   #58a6ff;
 }
 
-*{ box-sizing: border-box; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-body{
-	margin: 0;
-	font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-	background: radial-gradient(1200px 600px at 30% 10%, rgba(0,123,255,0.18), transparent 60%),
-		radial-gradient(900px 600px at 80% 30%, rgba(255,255,255,0.08), transparent 55%),
-		var(--Bg);
-	color: var(--Text);
+body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--Bg);
+    color: var(--Text);
+    min-height: 100vh;
 }
 
-.Page{
-	max-width: 1100px;
-	margin: 0 auto;
-	padding: 28px 18px 40px 18px;
+.Page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
 }
 
-.Header{
-	display: flex;
-	align-items: baseline;
-	justify-content: space-between;
-	gap: 18px;
-	margin-bottom: 18px;
+/* ── Header ── */
+.Header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--Border);
+    padding-bottom: 20px;
 }
 
-.Title{
-	font-size: 28px;
-	font-weight: 800;
-	letter-spacing: 0.2px;
+.Title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+    color: var(--Text);
 }
 
-.Subtitle{
-	font-size: 13px;
-	color: var(--Muted);
+.Subtitle {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--Muted);
+    margin-top: 4px;
 }
 
-.Grid{
-	display: grid;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
-	gap: 14px;
+/* ── Banner ── */
+.Banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(218, 54, 51, 0.10);
+    border: 1px solid rgba(218, 54, 51, 0.30);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 28px;
 }
 
-@media (max-width: 900px){
-	.Grid{ grid-template-columns: 1fr; }
+.BannerTitle {
+    font-size: 13px;
+    font-weight: 700;
+    color: #f85149;
 }
 
-.Card{
-	background: linear-gradient(180deg, var(--Panel2), var(--Panel));
-	border: 1px solid var(--Border);
-	border-radius: 18px;
-	padding: 16px;
-	box-shadow: 0 12px 30px rgba(0,0,0,0.30);
+.BannerText {
+    font-size: 13px;
+    color: rgba(255,255,255,0.65);
 }
 
-.CardTop{
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 12px;
-	margin-bottom: 10px;
+/* ── Node rows ── */
+.NodeList {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
 }
 
-.CardTitle{
-	font-size: 14px;
-	font-weight: 800;
-	letter-spacing: 0.2px;
-	color: rgba(255,255,255,0.92);
+.Row {
+    padding: 20px 0 0;
 }
 
-.Badge{
-	font-size: 12px;
-	font-weight: 800;
-	padding: 6px 10px;
-	border-radius: 999px;
-	border: 1px solid rgba(255,255,255,0.12);
-	background: rgba(0,0,0,0.18);
-	color: rgba(255,255,255,0.86);
+.RowSep {
+    height: 1px;
+    background: var(--Border);
+    margin-top: 16px;
 }
 
-.Hint{
-	font-size: 13px;
-	color: var(--Muted);
-	margin-bottom: 8px;
+.Row:last-child .RowSep {
+    display: none;
 }
 
-.Small{
-	font-size: 12px;
-	color: rgba(255,255,255,0.55);
+.RowHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
 }
 
-.Banner{
-	margin-top: 14px;
-	padding: 14px 16px;
-	border-radius: 18px;
-	border: 1px solid var(--Border);
-	background: rgba(0,0,0,0.18);
-	display: none;
+.RowLeft {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
-.BannerTitle{
-	font-weight: 900;
-	font-size: 13px;
-	margin-bottom: 4px;
+/* Status dot */
+.Dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    position: relative;
 }
 
-.BannerText{
-	font-size: 13px;
-	color: rgba(255,255,255,0.75);
+.dot-up    { background: var(--DotUp);  box-shadow: 0 0 6px var(--DotUp); }
+.dot-down  { background: var(--DotDown); box-shadow: 0 0 6px var(--DotDown); }
+.dot-unknown { background: var(--DotUnk); }
+
+/* Pulse animation on the dot when up */
+.dot-up::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    background: var(--DotUp);
+    opacity: 0.3;
+    animation: pulse 2.4s ease-out infinite;
 }
 
-.StateUp .Badge{
-	background: rgba(40, 200, 120, 0.12);
-	border-color: rgba(40, 200, 120, 0.35);
-	color: var(--Up);
+@keyframes pulse {
+    0%   { transform: scale(1);   opacity: 0.3; }
+    70%  { transform: scale(2.2); opacity: 0; }
+    100% { transform: scale(2.2); opacity: 0; }
 }
 
-.StateDown .Badge{
-	background: rgba(255, 80, 100, 0.12);
-	border-color: rgba(255, 80, 100, 0.35);
-	color: var(--Down);
+.NodeName {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--Text);
+    letter-spacing: 0.2px;
 }
 
-.StateUnknown .Badge{
-	background: rgba(180, 190, 210, 0.12);
-	border-color: rgba(180, 190, 210, 0.35);
-	color: var(--Unknown);
+.NodeDesc {
+    font-size: 12px;
+    color: var(--Muted);
+    padding-left: 4px;
+}
+
+/* Uptime percentage */
+.UptimePct {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    text-align: right;
+    letter-spacing: -0.2px;
+}
+
+.status-up      { color: var(--DotUp); }
+.status-down    { color: var(--DotDown); }
+.status-unknown { color: var(--DotUnk); }
+
+/* ── Bar strip ── */
+.BarWrap {
+    display: flex;
+    gap: 2px;
+    height: 34px;
+    align-items: flex-end;
+}
+
+.Bar {
+    flex: 1;
+    border-radius: 2px;
+    height: 100%;
+    min-width: 2px;
+    transition: opacity 0.15s, transform 0.15s;
+    cursor: default;
+}
+
+.Bar:hover {
+    opacity: 0.75;
+    transform: scaleY(1.08);
+    transform-origin: bottom;
+}
+
+/* Timeline labels */
+.TimeLabels {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--Muted);
+    margin-top: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Error fallback */
+.ErrorMsg {
+    font-size: 13px;
+    color: var(--Muted);
+    padding: 24px 0;
+    text-align: center;
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+@media (max-width: 600px) {
+    .Page { padding: 28px 16px 48px; }
+    .Title { font-size: 18px; }
+    .BarWrap { height: 28px; }
+}
+
+/* ── Clickable bar states ── */
+.Bar { transition: opacity 0.12s, transform 0.12s, outline 0.1s; }
+.Bar[style*="cursor"]:hover { opacity: 0.80; transform: scaleY(1.10); transform-origin: bottom; }
+.Bar.BarSelected {
+    outline: 2px solid rgba(255,255,255,0.55);
+    outline-offset: 1px;
+    opacity: 1 !important;
+    transform: scaleY(1.12) !important;
+    transform-origin: bottom;
+}
+
+/* ── Day detail panel ── */
+.DayPanel {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.28s ease, opacity 0.22s ease, margin 0.28s ease;
+    margin-top: 0;
+}
+.DayPanelOpen {
+    max-height: 600px;
+    opacity: 1;
+    margin-top: 12px;
+}
+
+.DayPanelLoading,
+.DayPanelError,
+.DayPanelEmpty {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--Muted);
+    padding: 14px 16px;
+    background: var(--Surface);
+    border: 1px solid var(--Border);
+    border-radius: 10px;
+}
+.DayPanelError { color: #f85149; }
+
+.DayPanelHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: var(--Surface);
+    border: 1px solid var(--Border);
+    border-radius: 10px 10px 0 0;
+    border-bottom: none;
+}
+
+.DayPanelDate {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--Text);
+    flex-shrink: 0;
+}
+
+.DayPanelStat {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--Muted);
+}
+
+.DayPanelUptimePct { font-weight: 600; }
+.pct-good { color: var(--DotUp) !important; }
+.pct-warn { color: var(--DotDeg) !important; }
+.pct-bad  { color: var(--DotDown) !important; }
+
+.DayPanelClose {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: var(--Muted);
+    cursor: pointer;
+    font-size: 13px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: color 0.12s, background 0.12s;
+}
+.DayPanelClose:hover { color: var(--Text); background: rgba(255,255,255,0.08); }
+
+
+@media (max-width: 600px) {
+    .DayPanelHeader { flex-wrap: wrap; gap: 6px; }
+    .SpanTime { display: none; }
+}
+
+/* ── Day summary body ── */
+.DaySummaryBody {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    background: var(--Surface);
+    border: 1px solid var(--Border);
+    border-radius: 0 0 10px 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+}
+
+.DaySummaryIcon {
+    font-size: 11px;
+    flex-shrink: 0;
+}
+
+.DaySummaryText {
+    color: var(--Muted);
+    line-height: 1.5;
 }
