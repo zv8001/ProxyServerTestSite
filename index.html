@@ -1,3 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta http-equiv='refresh' content='0; URL=https://unknown-technologies.us/proxy/'>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Status</title>
+    <link rel="stylesheet" href="styles.css" />
 </head>
+<body>
+    <div class="Page">
+        <header class="Header">
+            <div class="HeaderLeft">
+                <div class="Title">Service Status</div>
+                <div id="LastUpdated" class="Subtitle">Loading…</div>
+            </div>
+        </header>
+
+        <section class="Banner" id="Banner" style="display:none">
+            <div class="BannerTitle" id="BannerTitle"></div>
+            <div class="BannerText" id="BannerText"></div>
+        </section>
+
+        <!-- Node rows injected here by app.js -->
+        <div class="NodeList" id="NodeList"></div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
