@@ -257,7 +257,7 @@ async function FetchAndRender() {
         const Container = document.getElementById("NodeList");
         if (Container.querySelectorAll(".Row").length === 0)
             Container.innerHTML = '<div class="ErrorMsg">Unable to reach backend. Status unavailable.</div>';
-        SetBanner("⚠ Status Unknown", "Backend cannot be queried. All node statuses are unknown.", true);
+        SetBanner("⚠ Status Unknown", "Backend cannot be queried. All node statuses are unknown. This incident is being logged and will display once the servers come back online.", true);
     }
 }
 
