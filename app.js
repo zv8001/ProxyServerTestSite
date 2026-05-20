@@ -1,5 +1,8 @@
 const BackendBaseUrl = "https://api.unknown-technologies.us/status_api";
+const FallbackHistoryUrl = "/history.fallback.json";
 const PollIntervalMs = 5000;
+let _UsingFallbackHistory = false;
+let _FallbackDaily = {};
 
 function NodeSlug(Name) {
     return Name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -30,6 +33,13 @@ function GetBarColor(State) {
         case "down":     return "var(--Down)";
         default:         return "var(--NoData)";
     }
+}
+
+function DayHumanSummary(Checks, Failures) {
+    if (!Checks) return "No data recorded for this day.";
+    if (!Failures) return "Fully operational. " + Checks + " checks, all passed.";
+    const Uptime = Math.round((1 - Failures / Checks) * 1000) / 10;
+    return Failures + " of " + Checks + " checks failed (" + Uptime + "% uptime).";
 }
 
 
@@ -77,17 +87,43 @@ async function OpenDayPanel(NodeSlug, Date, BarEl, RowEl) {
     requestAnimationFrame(() => requestAnimationFrame(() => Panel.classList.add("DayPanelOpen")));
 
     try {
-        const Res = await fetch(BackendBaseUrl + "/api/day/" + NodeSlug + "/" + Date, {
-            cache: "no-store",
-            headers: { "Accept": "application/json", "ngrok-skip-browser-warning": "true" }
-        });
-        const Data = SafeJsonParse(await Res.text());
-        if (!Data || !Res.ok) throw new Error("Bad response");
+        let Data = null;
+        if (!_UsingFallbackHistory) {
+            const Res = await fetch(BackendBaseUrl + "/api/day/" + NodeSlug + "/" + Date, {
+                cache: "no-store",
+                headers: { "Accept": "application/json", "ngrok-skip-browser-warning": "true" }
+            });
+            Data = SafeJsonParse(await Res.text());
+            if (!Data || !Res.ok) throw new Error("Bad response");
+        } else {
+            const Bucket = ((_FallbackDaily || {})[NodeSlug] || {})[Date] || { checks: 0, failures: 0 };
+            const Checks = Number(Bucket.checks || 0);
+            const Failures = Number(Bucket.failures || 0);
+            Data = {
+                NodeName: NodeSlug,
+                Date,
+                TotalChecks: Checks,
+                TotalFailures: Failures,
+                UptimePct: Checks ? Math.round((1 - Failures / Checks) * 10000) / 100 : null,
+                State: GetDayState(Bucket),
+                Summary: DayHumanSummary(Checks, Failures),
+            };
+        }
         RenderDayPanel(Panel, Data, Date);
     } catch (Err) {
         console.warn("Day detail fetch failed:", Err);
         Panel.innerHTML = '<div class="DayPanelError">Failed to load detail for ' + Date + '</div>';
     }
+}
+
+function GetDayState(Bucket) {
+    const Checks = Number(Bucket?.checks || 0);
+    const Failures = Number(Bucket?.failures || 0);
+    if (!Checks) return "nodata";
+    const Ratio = Failures / Checks;
+    if (Ratio < 0.01) return "up";
+    if (Ratio < 0.5) return "degraded";
+    return "down";
 }
 
 function RenderDayPanel(Panel, Data, Date) {
@@ -203,6 +239,28 @@ function BuildOrUpdateRow(Node, Container) {
 
 // ── Main poll loop ────────────────────────────────────────────────────────────
 
+async function FetchFallbackHistory() {
+    const Response = await fetch(FallbackHistoryUrl + "?t=" + Date.now(), {
+        cache: "no-store",
+        headers: { "Accept": "application/json" }
+    });
+    const Data = SafeJsonParse(await Response.text());
+    if (!Response.ok || !Data || !Array.isArray(Data.Nodes)) throw new Error("Fallback unavailable");
+    _UsingFallbackHistory = true;
+    _FallbackDaily = Data.Daily || {};
+    const Container = document.getElementById("NodeList");
+    for (const Node of Data.Nodes) {
+        Node.IsUnknown = true;
+        Node.StatusText = "Historical";
+        BuildOrUpdateRow(Node, Container);
+    }
+    const GeneratedAtUnix = Number(Data.GeneratedAtUnix || 0);
+    SetLastUpdated(GeneratedAtUnix > 0
+        ? "Showing mirrored history from " + new Date(GeneratedAtUnix * 1000).toLocaleString()
+        : "Showing mirrored history");
+    SetBanner("⚠ Live Status Unavailable", "Showing historical fallback data mirrored from GitHub. Current status may be stale.", true);
+}
+
 async function FetchAndRender() {
     try {
         const Response = await fetch(BackendBaseUrl + "/api/status", {
@@ -215,6 +273,7 @@ async function FetchAndRender() {
 
         const Data = SafeJsonParse(RawText);
         if (!Data) throw new Error("NonJsonResponse");
+        _UsingFallbackHistory = false;
 
         const Nodes     = Data.Nodes || [];
         const Container = document.getElementById("NodeList");
@@ -253,11 +312,16 @@ async function FetchAndRender() {
 
     } catch (Err) {
         console.log("FetchAndRender Error:", Err);
-        SetLastUpdated("Backend unreachable");
-        const Container = document.getElementById("NodeList");
-        if (Container.querySelectorAll(".Row").length === 0)
-            Container.innerHTML = '<div class="ErrorMsg">Unable to reach backend. Status unavailable.</div>';
-        SetBanner("⚠ Status Unknown", "Backend cannot be queried. All node statuses are unknown. This incident is being logged and will display once the servers come back online.", true);
+        try {
+            await FetchFallbackHistory();
+        } catch (FallbackErr) {
+            console.warn("Fallback history fetch failed:", FallbackErr);
+            SetLastUpdated("Backend unreachable");
+            const Container = document.getElementById("NodeList");
+            if (Container.querySelectorAll(".Row").length === 0)
+                Container.innerHTML = '<div class="ErrorMsg">Unable to reach backend. Status unavailable.</div>';
+            SetBanner("⚠ Status Unknown", "Backend cannot be queried and mirrored history is unavailable.", true);
+        }
     }
 }
 
