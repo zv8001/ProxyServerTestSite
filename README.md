@@ -14,4 +14,4 @@ As you sit in this endless void, what is it you wait for? A future that may neve
                                          |_|
 ```
 
-Powering the future
+Powering the future.
