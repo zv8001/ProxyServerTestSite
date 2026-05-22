@@ -1,6 +1,7 @@
 As you sit in this endless void, what is it you wait for? A future that may never come...
 
 ```text
+
 | | | |_ __ | | ___ __   _____      ___ __                 
 | | | | '_ \| |/ / '_ \ / _ \ \ /\ / / '_ \                
 | |_| | | | |   <| | | | (_) \ V  V /| | | |               
