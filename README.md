@@ -1,5 +1,6 @@
 As you sit in this endless void, what is it you wait for? A future that may never come...
 
+```text
 | | | |_ __ | | ___ __   _____      ___ __                 
 | | | | '_ \| |/ / '_ \ / _ \ \ /\ / / '_ \                
 | |_| | | | |   <| | | | (_) \ V  V /| | | |               
@@ -9,5 +10,7 @@ As you sit in this endless void, what is it you wait for? A future that may neve
   | |  __/ (__| | | | | | | (_) | | (_) | (_| | |  __/\__ \
   |_|\___|\___|_| |_|_| |_|\___/|_|\___/ \__, |_|\___||___/
                                          |___/             
-                                         |_|               
+                                         |_|
+```
+
 Powering the future
