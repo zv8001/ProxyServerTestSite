@@ -17,3 +17,4 @@ Powering the future.
 ```
 
 [Status Page](https://status.unknown-technologies.us/)
+[unknown-technologies.us](https://unknown-technologies.us/)
