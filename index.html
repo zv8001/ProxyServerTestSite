@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://api.unknown-technologies.net; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'" />
     <title>Status</title>
     <link rel="stylesheet" href="styles.css" />
 </head>
@@ -15,7 +16,7 @@
             </div>
         </header>
 
-        <section class="Banner" id="Banner" style="display:none">
+        <section class="Banner" id="Banner" hidden>
             <div class="BannerTitle" id="BannerTitle"></div>
             <div class="BannerText" id="BannerText"></div>
         </section>

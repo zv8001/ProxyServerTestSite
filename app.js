@@ -12,10 +12,11 @@ function SetBanner(TitleText, BodyText, IsVisible) {
     const Banner    = document.getElementById("Banner");
     const BannerTitle = document.getElementById("BannerTitle");
     const BannerText  = document.getElementById("BannerText");
-    if (!IsVisible) { Banner.style.display = "none"; return; }
+    Banner.hidden = !IsVisible;
+    if (!IsVisible) return;
     BannerTitle.textContent = TitleText;
     BannerText.textContent  = BodyText;
-    Banner.style.display = "flex";
+
 }
 
 function SetLastUpdated(Text) {
@@ -26,13 +27,13 @@ function SafeJsonParse(Text) {
     try { return JSON.parse(Text); } catch { return null; }
 }
 
-function GetBarColor(State) {
-    switch (State) {
-        case "up":       return "var(--Up)";
-        case "degraded": return "var(--Degraded)";
-        case "down":     return "var(--Down)";
-        default:         return "var(--NoData)";
-    }
+function GetBarClass(State) {
+    return {
+        up: "BarUp",
+        degraded: "BarDegraded",
+        down: "BarDown",
+        nodata: "BarNoData",
+    }[State] || "BarNoData";
 }
 
 function DayHumanSummary(Checks, Failures) {
@@ -78,7 +79,10 @@ async function OpenDayPanel(NodeSlug, Date, BarEl, RowEl) {
     // Build panel and insert it right after .BarWrap (stable anchor)
     const Panel = document.createElement("div");
     Panel.className = "DayPanel";
-    Panel.innerHTML = '<div class="DayPanelLoading">Loading ' + Date + '…</div>';
+    const Loading = document.createElement("div");
+    Loading.className = "DayPanelLoading";
+    Loading.textContent = "Loading " + Date + "…";
+    Panel.appendChild(Loading);
 
     const BarWrap = RowEl.querySelector(".BarWrap");
     BarWrap.insertAdjacentElement("afterend", Panel);
@@ -112,7 +116,10 @@ async function OpenDayPanel(NodeSlug, Date, BarEl, RowEl) {
         RenderDayPanel(Panel, Data, Date);
     } catch (Err) {
         console.warn("Day detail fetch failed:", Err);
-        Panel.innerHTML = '<div class="DayPanelError">Failed to load detail for ' + Date + '</div>';
+        const ErrorMessage = document.createElement("div");
+        ErrorMessage.className = "DayPanelError";
+        ErrorMessage.textContent = "Failed to load detail for " + Date;
+        Panel.replaceChildren(ErrorMessage);
     }
 }
 
@@ -127,26 +134,47 @@ function GetDayState(Bucket) {
 }
 
 function RenderDayPanel(Panel, Data, Date) {
-    const RawPct   = Data.UptimePct;
-    const PctClass = (RawPct == null) ? "pct-warn" : RawPct >= 99 ? "pct-good" : RawPct >= 80 ? "pct-warn" : "pct-bad";
+    const RawPct = Data.UptimePct;
+    const PctClass = RawPct == null ? "pct-warn" : RawPct >= 99 ? "pct-good" : RawPct >= 80 ? "pct-warn" : "pct-bad";
     const StateIcon = Data.State === "up" ? "▲" : Data.State === "down" ? "▼" : "●";
     const IconClass = Data.State === "up" ? "pct-good" : Data.State === "down" ? "pct-bad" : "pct-warn";
 
-    const Html =
-        '<div class="DayPanelHeader">' +
-            '<span class="DayPanelDate">' + Date + '</span>' +
-            '<span class="DayPanelStat">' + Data.TotalChecks + ' checks</span>' +
-            '<span class="DayPanelStat DayPanelUptimePct ' + PctClass + '">' +
-                (RawPct != null ? RawPct.toFixed(2) + "% uptime" : "No data") +
-            '</span>' +
-            '<button class="DayPanelClose" onclick="CloseDayPanel()">✕</button>' +
-        '</div>' +
-        '<div class="DaySummaryBody">' +
-            '<span class="DaySummaryIcon ' + IconClass + '">' + StateIcon + '</span>' +
-            '<span class="DaySummaryText">' + (Data.Summary || "No data recorded for this day.") + '</span>' +
-        '</div>';
+    const Header = document.createElement("div");
+    Header.className = "DayPanelHeader";
 
-    Panel.innerHTML = Html;
+    const DateText = document.createElement("span");
+    DateText.className = "DayPanelDate";
+    DateText.textContent = Date;
+
+    const Checks = document.createElement("span");
+    Checks.className = "DayPanelStat";
+    Checks.textContent = Number(Data.TotalChecks || 0) + " checks";
+
+    const Uptime = document.createElement("span");
+    Uptime.classList.add("DayPanelStat", "DayPanelUptimePct", PctClass);
+    Uptime.textContent = RawPct != null ? Number(RawPct).toFixed(2) + "% uptime" : "No data";
+
+    const CloseButton = document.createElement("button");
+    CloseButton.className = "DayPanelClose";
+    CloseButton.type = "button";
+    CloseButton.textContent = "✕";
+    CloseButton.setAttribute("aria-label", "Close day details");
+    CloseButton.addEventListener("click", CloseDayPanel);
+    Header.append(DateText, Checks, Uptime, CloseButton);
+
+    const Summary = document.createElement("div");
+    Summary.className = "DaySummaryBody";
+
+    const Icon = document.createElement("span");
+    Icon.classList.add("DaySummaryIcon", IconClass);
+    Icon.textContent = StateIcon;
+
+    const SummaryText = document.createElement("span");
+    SummaryText.className = "DaySummaryText";
+    SummaryText.textContent = Data.Summary || "No data recorded for this day.";
+    Summary.append(Icon, SummaryText);
+
+    Panel.replaceChildren(Header, Summary);
 }
 
 // ── Row builder ───────────────────────────────────────────────────────────────
@@ -183,7 +211,11 @@ function BuildOrUpdateRow(Node, Container) {
         const BarWrap = document.createElement("div"); BarWrap.className = "BarWrap";   Row.appendChild(BarWrap);
         // DayPanel goes here (injected dynamically)
         const Labels  = document.createElement("div"); Labels.className  = "TimeLabels";
-        Labels.innerHTML = '<span>‹ 90 DAYS AGO</span><span>TODAY</span>';
+        const OldestLabel = document.createElement("span");
+        OldestLabel.textContent = "‹ 90 DAYS AGO";
+        const TodayLabel = document.createElement("span");
+        TodayLabel.textContent = "TODAY";
+        Labels.append(OldestLabel, TodayLabel);
         Row.appendChild(Labels);
         const Sep = document.createElement("div"); Sep.className = "RowSep"; Row.appendChild(Sep);
 
@@ -192,23 +224,37 @@ function BuildOrUpdateRow(Node, Container) {
 
     // ── Update header ──
     const Header = Row.querySelector(".RowHeader");
-    Header.innerHTML =
-        '<div class="RowLeft">' +
-            '<span class="Dot ' + DotClass + '"></span>' +
-            '<span class="NodeName">' + Node.Name + '</span>' +
-            (Node.Description ? '<span class="NodeDesc">' + Node.Description + '</span>' : '') +
-        '</div>' +
-        '<div class="UptimePct ' + StatusClass + '">' + UptimeText + '</div>';
+    const RowLeft = document.createElement("div");
+    RowLeft.className = "RowLeft";
+
+    const Dot = document.createElement("span");
+    Dot.classList.add("Dot", DotClass);
+
+    const Name = document.createElement("span");
+    Name.className = "NodeName";
+    Name.textContent = Node.Name;
+    RowLeft.append(Dot, Name);
+
+    if (Node.Description) {
+        const Description = document.createElement("span");
+        Description.className = "NodeDesc";
+        Description.textContent = Node.Description;
+        RowLeft.appendChild(Description);
+    }
+
+    const Uptime = document.createElement("div");
+    Uptime.classList.add("UptimePct", StatusClass);
+    Uptime.textContent = UptimeText;
+    Header.replaceChildren(RowLeft, Uptime);
 
     // ── Rebuild bars (but keep any open DayPanel in place) ──
     const BarWrap = Row.querySelector(".BarWrap");
-    BarWrap.innerHTML = "";
+    BarWrap.replaceChildren();
 
     const History = Node.History || [];
     for (const Entry of History) {
         const Bar = document.createElement("div");
-        Bar.className = "Bar";
-        Bar.style.background = GetBarColor(Entry.state);
+        Bar.classList.add("Bar", GetBarClass(Entry.state));
 
         const StateLabel = { up: "Operational", degraded: "Degraded", down: "Outage", nodata: "No data" }[Entry.state] || "Unknown";
         const Clickable  = Entry.state !== "nodata";
@@ -216,7 +262,7 @@ function BuildOrUpdateRow(Node, Container) {
         Bar.title = Entry.date + "  •  " + StateLabel + (Clickable ? "  —  click for details" : "");
 
         if (Clickable) {
-            Bar.style.cursor = "pointer";
+            Bar.classList.add("BarClickable");
             Bar.addEventListener("click", (function(barEl, slug, date, rowEl) {
                 return function(e) {
                     e.stopPropagation();
@@ -319,7 +365,12 @@ async function FetchAndRender() {
             SetLastUpdated("Backend unreachable");
             const Container = document.getElementById("NodeList");
             if (Container.querySelectorAll(".Row").length === 0)
-                Container.innerHTML = '<div class="ErrorMsg">Unable to reach backend. Status unavailable.</div>';
+                {
+                    const ErrorMessage = document.createElement("div");
+                    ErrorMessage.className = "ErrorMsg";
+                    ErrorMessage.textContent = "Unable to reach backend. Status unavailable.";
+                    Container.replaceChildren(ErrorMessage);
+                }
             SetBanner("⚠ Status Unknown", "Backend cannot be queried and mirrored history is unavailable.", true);
         }
     }

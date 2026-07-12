@@ -69,6 +69,10 @@ body {
     margin-bottom: 28px;
 }
 
+.Banner[hidden] {
+    display: none;
+}
+
 .BannerTitle {
     font-size: 13px;
     font-weight: 700;
@@ -190,6 +194,12 @@ body {
     cursor: default;
 }
 
+.BarUp { background: var(--Up); }
+.BarDegraded { background: var(--Degraded); }
+.BarDown { background: var(--Down); }
+.BarNoData { background: var(--NoData); }
+.BarClickable { cursor: pointer; }
+
 .Bar:hover {
     opacity: 0.75;
     transform: scaleY(1.08);
@@ -225,7 +235,7 @@ body {
 
 /* ── Clickable bar states ── */
 .Bar { transition: opacity 0.12s, transform 0.12s, outline 0.1s; }
-.Bar[style*="cursor"]:hover { opacity: 0.80; transform: scaleY(1.10); transform-origin: bottom; }
+.BarClickable:hover { opacity: 0.80; transform: scaleY(1.10); transform-origin: bottom; }
 .Bar.BarSelected {
     outline: 2px solid rgba(255,255,255,0.55);
     outline-offset: 1px;
