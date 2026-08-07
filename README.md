@@ -16,6 +16,6 @@ As you sit in this endless void, what is it you wait for? A future that may neve
 Powering the future.
 ```
 
-[Status Page](https://status.unknown-technologies.us/)
+[Status Page](https://status.unknown-technologies.net/)
 
-[unknown-technologies.us](https://unknown-technologies.us/)
+[unknown-technologies.us](https://unknown-technologies.net/)
