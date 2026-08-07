@@ -18,4 +18,4 @@ Powering the future.
 
 [Status Page](https://status.unknown-technologies.net/)
 
-[unknown-technologies.us](https://unknown-technologies.net/)
+[unknown-technologies.net](https://unknown-technologies.net/)
